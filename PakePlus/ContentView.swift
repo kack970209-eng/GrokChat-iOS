@@ -15,7 +15,7 @@ struct ContentView: View {
             Color.white
                 .ignoresSafeArea()
             // 你的主要内容
-            WebView(url: URL(string: "https://chat.deepseek.com/sign_in")!)
+            WebView(url: URL(string: "https://www.netflixgc.com/")!)
         }
     }
 }
