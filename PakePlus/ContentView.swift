@@ -15,7 +15,7 @@ struct ContentView: View {
             Color.white
                 .ignoresSafeArea()
             // 你的主要内容
-            WebView(url: URL(string: "https://missav.ws/dm45")!)
+            WebView(url: URL(string: "file:///local_app/index.html")!)
         }
     }
 }

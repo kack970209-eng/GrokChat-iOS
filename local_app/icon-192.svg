@@ -1,0 +1,43 @@
+<svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pythonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3776ab;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffd43b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f8f9fa;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="192" height="192" rx="24" fill="url(#bgGradient)" stroke="#e9ecef" stroke-width="2"/>
+  
+  <!-- Python Logo 简化版 -->
+  <g transform="translate(48, 48)">
+    <!-- 上半部分 (蓝色) -->
+    <path d="M48 0 C21.5 0 0 21.5 0 48 L0 72 L24 72 L24 48 C24 34.7 34.7 24 48 24 L72 24 C78.6 24 84 29.4 84 36 L84 60 C84 66.6 78.6 72 72 72 L48 72 C21.5 72 0 93.5 0 120 L0 144 C0 157.3 10.7 168 24 168 L72 168 C85.3 168 96 157.3 96 144 L96 120 L72 120 L72 144 C72 150.6 66.6 156 60 156 L36 156 C29.4 156 24 150.6 24 144 L24 120 C24 106.7 34.7 96 48 96 L72 96 C98.5 96 120 74.5 120 48 L120 24 C120 10.7 109.3 0 96 0 L48 0 Z" fill="#3776ab"/>
+    
+    <!-- 下半部分 (黄色) -->
+    <path d="M48 72 C74.5 72 96 93.5 96 120 L96 144 C96 157.3 85.3 168 72 168 L24 168 C10.7 168 0 157.3 0 144 L0 120 L24 120 L24 144 C24 150.6 29.4 156 36 156 L60 156 C66.6 156 72 150.6 72 144 L72 120 C72 106.7 61.3 96 48 96 L24 96 C-2.5 96 -24 74.5 -24 48 L-24 24 C-24 10.7 -13.3 0 0 0 L48 0 C61.3 0 72 10.7 72 24 L72 48 L48 48 L48 24 C48 17.4 42.6 12 36 12 L12 12 C5.4 12 0 17.4 0 24 L0 48 C0 61.3 10.7 72 24 72 L48 72 Z" fill="#ffd43b" transform="translate(24, 24)"/>
+    
+    <!-- 眼睛 -->
+    <circle cx="30" cy="30" r="6" fill="#ffffff"/>
+    <circle cx="30" cy="30" r="3" fill="#3776ab"/>
+    
+    <circle cx="66" cy="66" r="6" fill="#ffffff"/>
+    <circle cx="66" cy="66" r="3" fill="#ffd43b"/>
+  </g>
+  
+  <!-- 装饰性代码符号 -->
+  <g transform="translate(24, 140)" fill="#3776ab" opacity="0.3">
+    <text font-family="monospace" font-size="12" font-weight="bold">&lt;/&gt;</text>
+  </g>
+  
+  <g transform="translate(140, 32)" fill="#ffd43b" opacity="0.3">
+    <text font-family="monospace" font-size="12" font-weight="bold">{}</text>
+  </g>
+  
+  <!-- 底部文字 -->
+  <text x="96" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#3776ab">Python</text>
+</svg>

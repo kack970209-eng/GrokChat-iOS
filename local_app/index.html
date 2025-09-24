@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Python综合学习网站 - 语法详解、依赖安装、代码示例">
+    <title>Python学习宝典</title>
+    
+    <!-- PWA 配置 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3776ab">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- 样式文件 -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- 字体图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fab fa-python"></i>
+                <span>Python学习宝典</span>
+            </div>
+            <div class="nav-menu" id="nav-menu">
+                <a href="#home" class="nav-link active" data-section="home">
+                    <i class="fas fa-home"></i> 首页
+                </a>
+                <a href="#syntax" class="nav-link" data-section="syntax">
+                    <i class="fas fa-code"></i> 语法详解
+                </a>
+                <a href="#dependencies" class="nav-link" data-section="dependencies">
+                    <i class="fas fa-download"></i> 依赖安装
+                </a>
+                <a href="#examples" class="nav-link" data-section="examples">
+                    <i class="fas fa-file-code"></i> 代码示例
+                </a>
+                <a href="#favorites" class="nav-link" data-section="favorites">
+                    <i class="fas fa-star"></i> 我的收藏
+                </a>
+            </div>
+            <div class="nav-toggle" id="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <main class="main-content">
+        <!-- 首页 -->
+        <section id="home" class="content-section active">
+            <div class="hero">
+                <div class="hero-content">
+                    <h1>欢迎来到Python学习宝典</h1>
+                    <p>全面的Python学习资源，从基础语法到实用代码示例，助您快速掌握Python编程</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" onclick="showSection('syntax')">
+                            <i class="fas fa-rocket"></i> 开始学习
+                        </button>
+                        <button class="btn btn-secondary" onclick="showSection('examples')">
+                            <i class="fas fa-code"></i> 查看示例
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="features">
+                <div class="feature-card">
+                    <i class="fas fa-book"></i>
+                    <h3>语法详解</h3>
+                    <p>详细的Python语法说明，从基础到高级，循序渐进</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-cogs"></i>
+                    <h3>依赖管理</h3>
+                    <p>完整的包管理和依赖安装指南，让您轻松管理项目</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-lightbulb"></i>
+                    <h3>实用示例</h3>
+                    <p>丰富的代码示例，涵盖各种应用场景和最佳实践</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-save"></i>
+                    <h3>本地存储</h3>
+                    <p>收藏喜欢的内容，添加个人笔记，数据本地保存</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Python语法详解 -->
+        <section id="syntax" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-code"></i> Python语法详解</h2>
+                <p>从基础语法到高级特性，全面掌握Python编程</p>
+            </div>
+            
+            <div class="syntax-categories">
+                <div class="category-card" onclick="showSyntaxDetail('basic')">
+                    <h3>基础语法</h3>
+                    <p>变量、数据类型、运算符</p>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                <div class="category-card" onclick="showSyntaxDetail('control')">
+                    <h3>控制结构</h3>
+                    <p>条件语句、循环结构</p>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                <div class="category-card" onclick="showSyntaxDetail('functions')">
+                    <h3>函数与模块</h3>
+                    <p>函数定义、模块导入</p>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                <div class="category-card" onclick="showSyntaxDetail('oop')">
+                    <h3>面向对象</h3>
+                    <p>类、对象、继承</p>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div id="syntax-detail" class="syntax-detail hidden">
+                <!-- 动态内容将在这里显示 -->
+            </div>
+        </section>
+
+        <!-- Python依赖安装 -->
+        <section id="dependencies" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-download"></i> Python依赖安装指南</h2>
+                <p>掌握Python包管理，轻松安装和管理项目依赖</p>
+            </div>
+            
+            <div class="dep-tabs">
+                <button class="tab-btn active" onclick="showDepTab('pip')">pip 包管理</button>
+                <button class="tab-btn" onclick="showDepTab('conda')">conda 环境</button>
+                <button class="tab-btn" onclick="showDepTab('venv')">虚拟环境</button>
+                <button class="tab-btn" onclick="showDepTab('requirements')">requirements.txt</button>
+            </div>
+
+            <div id="dep-content" class="dep-content">
+                <!-- 依赖安装内容将在这里显示 -->
+            </div>
+        </section>
+
+        <!-- 代码示例 -->
+        <section id="examples" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-file-code"></i> 实用代码示例</h2>
+                <p>精选的Python代码示例，涵盖各种应用场景</p>
+            </div>
+            
+            <div class="example-filters">
+                <button class="filter-btn active" onclick="filterExamples('all')">全部</button>
+                <button class="filter-btn" onclick="filterExamples('basic')">基础</button>
+                <button class="filter-btn" onclick="filterExamples('web')">Web开发</button>
+                <button class="filter-btn" onclick="filterExamples('data')">数据处理</button>
+                <button class="filter-btn" onclick="filterExamples('automation')">自动化</button>
+            </div>
+
+            <div id="examples-grid" class="examples-grid">
+                <!-- 代码示例将在这里显示 -->
+            </div>
+        </section>
+
+        <!-- 我的收藏 -->
+        <section id="favorites" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-star"></i> 我的收藏</h2>
+                <p>您收藏的代码示例和笔记</p>
+            </div>
+            
+            <div class="favorites-tabs">
+                <button class="tab-btn active" onclick="showFavTab('bookmarks')">收藏的代码</button>
+                <button class="tab-btn" onclick="showFavTab('notes')">我的笔记</button>
+            </div>
+
+            <div id="favorites-content" class="favorites-content">
+                <!-- 收藏内容将在这里显示 -->
+            </div>
+        </section>
+    </main>
+
+    <!-- 代码复制提示 -->
+    <div id="copy-toast" class="copy-toast">
+        <i class="fas fa-check"></i>
+        代码已复制到剪贴板
+    </div>
+
+    <!-- 笔记模态框 -->
+    <div id="note-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加笔记</h3>
+                <span class="close" onclick="closeNoteModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="note-title" placeholder="笔记标题" class="note-input">
+                <textarea id="note-content" placeholder="在这里写下您的笔记..." class="note-textarea"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeNoteModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveNote()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript文件 -->
+    <script src="script.js"></script>
+</body>
+</html>

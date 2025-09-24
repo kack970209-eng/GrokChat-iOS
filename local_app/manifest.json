@@ -1,0 +1,75 @@
+{
+  "name": "Python学习宝典",
+  "short_name": "Python宝典",
+  "description": "全面的Python学习资源，从基础语法到实用代码示例",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3776ab",
+  "orientation": "portrait-primary",
+  "scope": "./",
+  "lang": "zh-CN",
+  "categories": ["education", "productivity", "developer"],
+  "icons": [
+    {
+      "src": "icon-192.svg",
+      "sizes": "72x72 96x96 128x128 144x144 152x152 192x192 384x384 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "语法详解",
+      "short_name": "语法",
+      "description": "查看Python语法详解",
+      "url": "./index.html#syntax",
+      "icons": [
+        {
+          "src": "icon-192.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "代码示例",
+      "short_name": "示例",
+      "description": "浏览实用代码示例",
+      "url": "./index.html#examples",
+      "icons": [
+        {
+          "src": "icon-192.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "我的收藏",
+      "short_name": "收藏",
+      "description": "查看收藏的内容",
+      "url": "./index.html#favorites",
+      "icons": [
+        {
+          "src": "icon-192.svg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Python学习宝典桌面版截图"
+    },
+    {
+      "src": "screenshot-narrow.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Python学习宝典移动版截图"
+    }
+  ]
+}
