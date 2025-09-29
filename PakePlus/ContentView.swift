@@ -15,7 +15,7 @@ struct ContentView: View {
             Color.white
                 .ignoresSafeArea()
             // 你的主要内容
-            WebView(url: URL(string: "https://space.coze.cn/?category=10000")!)
+            WebView(url: URL(string: "https://openrouter.ai/")!)
         }
     }
 }
