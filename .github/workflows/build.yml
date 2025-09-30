@@ -2,9 +2,23 @@ name: Build IPA
 
 on:
     workflow_dispatch:
-    # push:
-    #     branches:
-    #         - main
+        inputs:
+            app_name:
+                description: 'Application Name'
+                required: true
+                default: 'PakePlusApp'
+            bundle_id:
+                description: 'Bundle Identifier'
+                required: true
+                default: 'com.pakeplus.app'
+            description:
+                description: 'Application Description'
+                required: false
+                default: ''
+            version:
+                description: 'App Version'
+                required: true
+                default: '1.0.0'
 
 permissions:
     contents: write
@@ -44,32 +58,50 @@ jobs:
                   echo "Installing appicon tool..."
                   brew install Nonchalant/appicon/appicon
                   echo "Generating AppIcon..."
-                  appicon app-icon.png --output-path ./PakePlus/Assets.xcassets/AppIcon.appiconset
+                  # Check if app-icon.png exists, otherwise use a default
+                  if [ -f app-icon.png ]; then
+                      appicon app-icon.png --output-path ./PakePlus/Assets.xcassets/AppIcon.appiconset
+                  else
+                      echo "app-icon.png not found, using default icon."
+                      # You might want to copy a default icon here or handle it in Xcode
+                  end
+
+            - name: Prepare custom files (if any)
+              run: |
+                  if [ -d "local_app" ]; then
+                      echo "Copying custom files to PakePlus project..."
+                      cp -R local_app PakePlus/
+                  else
+                      echo "No custom files found."
+                  fi
 
             - name: Build for Release
               run: |
                   xcodebuild -project PakePlus.xcodeproj -scheme PakePlus -configuration Release -sdk iphoneos \
-                    CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+                    CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
+                    PRODUCT_BUNDLE_IDENTIFIER="${{ github.event.inputs.bundle_id }}" \
+                    PRODUCT_NAME="${{ github.event.inputs.app_name }}"
 
             - name: Package IPA
               run: |
-                  APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -type d -name "PakePlus.app" | grep Release-iphoneos | head -n 1)
+                  APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -type d -name "${{ github.event.inputs.app_name }}.app" | grep Release-iphoneos | head -n 1)
                   echo "APP_PATH is $APP_PATH"
                   mkdir -p Payload
                   cp -R "$APP_PATH" Payload/
-                  NAME="${{ env.NAME }}"
-                  VERSION="${{ env.VERSION }}"
-                  zip -r ${NAME}-${VERSION}.ipa Payload
+                  NAME="${{ github.event.inputs.app_name }}"
+                  VERSION="${{ github.event.inputs.version }}"
+                  zip -r "${NAME}-${VERSION}.ipa" Payload
                   mkdir -p export
-                  mv ${NAME}-${VERSION}.ipa export/
+                  mv "${NAME}-${VERSION}.ipa" export/
 
             - name: Publish IPA
               uses: softprops/action-gh-release@v1
               with:
-                  files: export/${{ env.NAME }}-${{ env.VERSION }}.ipa
-                  tag_name: '${{ env.NAME }}'
-                  name: '${{ env.NAME }} v${{ env.VERSION }}'
-                  body: '${{ env.PUBBODY }}'
+                  files: export/${{ github.event.inputs.app_name }}-${{ github.event.inputs.version }}.ipa
+                  tag_name: 'v${{ github.event.inputs.version }}'
+                  name: '${{ github.event.inputs.app_name }} v${{ github.event.inputs.version }}'
+                  body: '${{ github.event.inputs.description }}'
                   draft: false
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
