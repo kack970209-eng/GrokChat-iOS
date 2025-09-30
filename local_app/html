@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f2f2f7">
+    <meta name="description" content="謙數獨 - 一個簡單有趣的數獨遊戲">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/images/favicon-192x192.png">
+    <title>謙數獨</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "San Francisco", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s;
+        }
+        body.dark {
+            background-color: #1c2526;
+            color: #fff;
+        }
+        .container {
+            width: 600px;
+            max-width: 100vw;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s;
+        }
+        .container.dark {
+            background-color: #2d3839;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        h1 {
+            color: #000;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dark h1 {
+            color: #fff;
+        }
+        .menu-icon, .leaderboard-icon {
+            font-size: 20px;
+            cursor: pointer;
+            color: #007aff;
+            margin-left: 10px;
+        }
+        .menu-dropdown {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 10px;
+            z-index: 1;
+        }
+        .dark .menu-dropdown {
+            background-color: #2d3839;
+        }
+        .menu-dropdown span {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px;
+            font-size: 14px;
+            background: none;
+            border: none;
+            color: #007aff;
+            cursor: pointer;
+        }
+        .dark .menu-dropdown span {
+            color: #00ccff;
+        }
+        .menu-dropdown span:hover {
+            background-color: #f5f5f5;
+        }
+        .dark .menu-dropdown span:hover {
+            background-color: #3a4647;
+        }
+        .info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #8e8e93;
+        }
+        .dark .info {
+            color: #b0b0b0;
+        }
+        .grid {
+            display: inline-block;
+            border: 1px solid #d1d1d6;
+            background-color: #fff;
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .dark .grid {
+            border-color: #4a5556;
+            background-color: #2d3839;
+        }
+        .grid.paused {
+            background-color: #000;
+        }
+        .grid.paused td {
+            background-color: #000;
+            color: #000;
+            border-color: #000;
+        }
+        .grid table {
+            border-collapse: collapse;
+        }
+        .grid td {
+            width: 45px;
+            height: 45px;
+            border: 1px solid #d1d1d6;
+            text-align: center;
+            font-size: 18px;
+            background-color: #fff;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.2s;
+        }
+        .dark .grid td {
+            border-color: #4a5556;
+            background-color: #2d3839;
+            color: #fff;
+        }
+        .grid td.fixed {
+            background-color: #f5f5f5;
+            font-weight: 600;
+            cursor: default;
+        }
+        .dark .grid td.fixed {
+            background-color: #3a4647;
+        }
+        .grid td.selected {
+            background-color: #e5f0ff;
+        }
+        .dark .grid td.selected {
+            background-color: #4a5556;
+        }
+        .grid td.error {
+            background-color: #ffe5e5;
+            position: relative;
+        }
+        .dark .grid td.error {
+            background-color: #ff4d4d;
+        }
+        .grid td.error.show-message::after {
+            content: '答案錯誤';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #ff3b30;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2px 6px;
+            border-radius: 4px;
+            z-index: 1;
+            white-space: nowrap;
+        }
+        .dark .grid td.error.show-message::after {
+            color: #ff4d4d;
+            background-color: rgba(45, 56, 57, 0.9);
+        }
+        .grid td.notes {
+            font-size: 10px;
+            color: #8e8e93;
+            line-height: 1;
+        }
+        .dark .grid td.notes {
+            color: #b0b0b0;
+        }
+        .grid td:nth-child(3n) {
+            border-right: 2px solid #d1d1d6;
+        }
+        .dark .grid td:nth-child(3n) {
+            border-right-color: #4a5556;
+        }
+        .grid tr:nth-child(3n) td {
+            border-bottom: 2px solid #d1d1d6;
+        }
+        .dark .grid tr:nth-child(3n) td {
+            border-bottom-color: #4a5556;
+        }
+        .controls, .numbers {
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: nowrap;
+            gap: 20px;
+            position: relative;
+        }
+        .controls .control-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            font-size: 14px;
+            color: #000;
+        }
+        .dark .controls .control-item {
+            color: #fff;
+        }
+        .controls .control-item i {
+            font-size: 20px;
+        }
+        .controls .control-item .annotation {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #007aff;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: none;
+            white-space: nowrap;
+        }
+        .dark .controls .control-item .annotation {
+            color: #00ccff;
+            background-color: rgba(45, 56, 57, 0.9);
+        }
+        .controls .glow-line {
+            position: absolute;
+            bottom: -5px;
+            height: 3px;
+            background: linear-gradient(90deg, #00ffcc, #00ccff);
+            box-shadow: 0 0 8px #00ffcc, 0 0 4px #00ccff;
+            transition: all 0.3s ease;
+        }
+        .numbers button {
+            padding: 8px;
+            font-size: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #f5f5f5;
+            color: #000;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dark .numbers button {
+            background-color: #3a4647;
+            color: #fff;
+        }
+        .hint-popup, .leaderboard-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 2;
+            text-align: center;
+            font-size: 14px;
+            color: #000;
+            max-width: 90vw;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .dark .hint-popup, .dark .leaderboard-popup {
+            background-color: #2d3839;
+            color: #fff;
+        }
+        .hint-popup button, .leaderboard-popup button {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background-color: #007aff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 8px;
+            border-bottom: 1px solid #d1d1d6;
+        }
+        .dark .leaderboard-table th, .dark .leaderboard-table td {
+            border-bottom-color: #4a5556;
+        }
+        .notes-status {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 10px;
+            color: #fff;
+            background-color: #007aff;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .auth-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: space-between;
+            padding: 20px 0;
+        }
+        .auth-container h1 {
+            margin: 0;
+        }
+        .auth-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 300px;
+        }
+        .auth-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #000;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            justify-content: center;
+        }
+        .dark .auth-option {
+            color: #fff;
+            background-color: #3a4647;
+        }
+        .auth-option i {
+            font-size: 20px;
+        }
+        .auth-form {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            width: 300px;
+        }
+        .auth-form .input-group {
+            position: relative;
+        }
+        .auth-form input {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .dark .auth-form input {
+            border-color: #4a5556;
+            background-color: #3a4647;
+            color: #fff;
+        }
+        .auth-form .eye-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #007aff;
+        }
+        .dark .auth-form .eye-icon {
+            color: #00ccff;
+        }
+        .auth-form button {
+            padding: 8px;
+            background-color: #007aff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .error-message {
+            color: #ff3b30;
+            font-size: 12px;
+            display: none;
+        }
+        .dark .error-message {
+            color: #ff4d4d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="main-container">
+        <div id="auth-screen">
+            <div class="auth-container">
+                <h1><i class="fas fa-puzzle-piece"></i> 謙數獨</h1>
+                <div style="flex-grow: 1;"></div>
+                <div class="auth-buttons">
+                    <div class="auth-option" onclick="showForm('register')">
+                        <i class="fas fa-user-plus"></i> 註冊
+                    </div>
+                    <div class="auth-option" onclick="showForm('login')">
+                        <i class="fas fa-sign-in-alt"></i> 登入
+                    </div>
+                    <div class="auth-option" onclick="guestLogin()">
+                        <i class="fas fa-user"></i> 訪客登入
+                    </div>
+                </div>
+            </div>
+            <div class="auth-form" id="register-form">
+                <div class="input-group">
+                    <input type="text" id="reg-id" placeholder="用戶ID">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="reg-pwd" placeholder="密碼">
+                    <i class="fas fa-eye eye-icon" onclick="togglePassword('reg-pwd')"></i>
+                </div>
+                <button onclick="register()">註冊</button>
+                <span class="error-message" id="reg-error"></span>
+            </div>
+            <div class="auth-form" id="login-form">
+                <div class="input-group">
+                    <input type="text" id="login-id" placeholder="用戶ID">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="login-pwd" placeholder="密碼">
+                    <i class="fas fa-eye eye-icon" onclick="togglePassword('login-pwd')"></i>
+                </div>
+                <button onclick="login()">登入</button>
+                <span class="error-message" id="login-error"></span>
+            </div>
+        </div>
+        <div id="game-screen" style="display: none;">
+            <div class="header">
+                <h1>謙數獨</h1>
+                <div>
+                    <i class="fas fa-trophy leaderboard-icon" onclick="showLeaderboard()"></i>
+                    <i class="fas fa-bars menu-icon" onclick="toggleMenu()"></i>
+                </div>
+            </div>
+            <div class="menu-dropdown" id="menu-dropdown">
+                <span onclick="startGame('classic', 'easy')">簡單</span>
+                <span onclick="startGame('classic', 'medium')">中等</span>
+                <span onclick="startGame('classic', 'hard')">困難</span>
+                <span onclick="startGame('classic', 'expert')">專家</span>
+                <span onclick="startGame('classic', 'veteran')">老手</span>
+                <span onclick="startGame('classic', 'extreme')">極限</span>
+                <span onclick="restartGame()">重新開局</span>
+                <span onclick="toggleThemeMenu()" id="theme-toggle">
+                    <i class="fas fa-palette"></i> 切換主題
+                </span>
+                <div id="theme-options" style="display: none; margin-left: 10px;">
+                    <span onclick="setTheme('light')"><i class="fas fa-sun"></i> 淺色</span>
+                    <span onclick="setTheme('dark')"><i class="fas fa-moon"></i> 深色</span>
+                </div>
+                <span onclick="logout()" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span id="logout-text">登出</span>
+                </span>
+            </div>
+            <div class="info">
+                <div>時間: <span id="timer">00:00</span></div>
+                <div>難度: <span id="difficulty">中等</span></div>
+                <div>提示剩餘: <span id="hints-remaining">5</span></div>
+            </div>
+            <div class="grid" id="sudoku-grid-container">
+                <table id="sudoku-grid"></table>
+            </div>
+            <div class="controls">
+                <div class="control-item" onclick="showNewGameOptions(); showAnnotation(this); moveGlowLine(this);">
+                    <i class="fas fa-plus"></i>
+                    <span class="annotation">新遊戲</span>
+                </div>
+                <div class="control-item" onclick="checkSolution(); showAnnotation(this); moveGlowLine(this);">
+                    <i class="fas fa-check"></i>
+                    <span class="annotation">檢查</span>
+                </div>
+                <div class="control-item" onclick="undoMove(); showAnnotation(this); moveGlowLine(this);">
+                    <i class="fas fa-undo"></i>
+                    <span class="annotation">還原</span>
+                </div>
+                <div class="control-item" id="pause-btn" onclick="togglePause(); showAnnotation(this); moveGlowLine(this);">
+                    <i class="fas fa-pause"></i>
+                    <span class="annotation">暫停</span>
+                </div>
+                <div class="control-item" onclick="eraseCell(); showAnnotation(this); moveGlowLine(this);">
+                    <i class="fas fa-eraser"></i>
+                    <span class="annotation">橡皮擦</span>
+                </div>
+                <div class="control-item notes-item" onclick="toggleNotesMode(); showAnnotation(this); moveGlowLine(this);">
+                    <i class="fas fa-pencil-alt"></i>
+                    <span class="notes-status">關</span>
+                    <span class="annotation">筆記</span>
+                </div>
+                <div class="control-item" onclick="giveHint(); showAnnotation(this); moveGlowLine(this);">
+                    <i class="fas fa-lightbulb"></i>
+                    <span class="annotation">提示</span>
+                </div>
+                <div class="glow-line" id="glow-line"></div>
+            </div>
+            <div class="numbers">
+                <button onclick="fillNumber(1)">1</button>
+                <button onclick="fillNumber(2)">2</button>
+                <button onclick="fillNumber(3)">3</button>
+                <button onclick="fillNumber(4)">4</button>
+                <button onclick="fillNumber(5)">5</button>
+                <button onclick="fillNumber(6)">6</button>
+                <button onclick="fillNumber(7)">7</button>
+                <button onclick="fillNumber(8)">8</button>
+                <button onclick="fillNumber(9)">9</button>
+            </div>
+            <div class="hint-popup" id="hint-popup">
+                <p id="hint-text"></p>
+                <button onclick="closeHintPopup()"><i class="fas fa-check"></i> 確定</button>
+            </div>
+            <div class="leaderboard-popup" id="leaderboard-popup">
+                <h2>排行榜</h2>
+                <table class="leaderboard-table" id="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>用戶名稱</th>
+                            <th>簡單</th>
+                            <th>中等</th>
+                            <th>困難</th>
+                            <th>專家</th>
+                            <th>老手</th>
+                            <th>極限</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <button onclick="closeLeaderboard()">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let grid = [];
+        let solution = [];
+        let moves = [];
+        let selectedCell = null;
+        let timerInterval = null;
+        let seconds = 0;
+        let isPaused = false;
+        let notesMode = false;
+        let hintsRemaining = 5;
+        let currentAnnotationTimeout = null;
+
+        const puzzles = {
+            classic: {
+                easy: [[5,3,0,0,7,0,0,0,0],[6,0,0,1,9,5,0,0,0],[0,9,8,0,0,0,0,6,0],[8,0,0,0,6,0,0,0,3],[4,0,0,8,0,3,0,0,1],[7,0,0,0,2,0,0,0,6],[0,6,0,0,0,0,2,8,0],[0,0,0,4,1,9,0,0,5],[0,0,0,0,8,0,0,7,9]],
+                medium: [[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,3,0,8,5],[0,0,1,0,2,0,0,0,0],[0,0,0,5,0,7,0,0,0],[0,0,4,0,0,0,1,0,0],[0,9,0,0,0,0,0,0,0],[5,0,0,0,0,0,0,7,3],[0,0,2,0,0,0,0,0,0],[0,0,0,0,0,0,4,0,0]],
+                hard: [[8,0,0,0,0,0,0,0,0],[0,0,3,6,0,0,0,0,0],[0,7,0,0,9,0,2,0,0],[0,5,0,0,0,7,0,0,0],[0,0,0,0,4,5,7,0,0],[0,0,0,1,0,0,0,3,0],[0,0,1,0,0,0,0,6,8],[0,0,8,5,0,0,0,1,0],[0,0,0,0,0,0,4,0,0]],
+                expert: [[0,0,5,3,0,0,0,0,0],[8,0,0,0,0,0,0,2,0],[0,7,0,0,1,0,5,0,0],[4,0,0,0,0,5,3,0,0],[0,1,0,0,0,0,0,0,6],[0,0,3,2,0,0,0,8,0],[0,6,0,0,0,0,0,0,9],[0,0,4,0,0,0,0,0,0],[0,0,0,0,0,9,7,0,0]],
+                veteran: [[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,5,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]],
+                extreme: [[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]]
+            }
+        };
+
+        function initGrid() {
+            const table = document.getElementById('sudoku-grid');
+            table.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const tr = document.createElement('tr');
+                for (let j = 0; j < 9; j++) {
+                    const td = document.createElement('td');
+                    if (!isPaused && grid[i][j] !== 0) {
+                        td.textContent = grid[i][j];
+                        if (grid[i][j] === solution[i][j]) {
+                            td.classList.add('fixed');
+                        } else {
+                            td.classList.add('error');
+                        }
+                    }
+                    td.onclick = () => !isPaused && selectCell(td, i, j);
+                    tr.appendChild(td);
+                }
+                table.appendChild(tr);
+            }
+        }
+
+        function selectCell(cell, row, col) {
+            if (cell.classList.contains('fixed')) return;
+            if (selectedCell) selectedCell.classList.remove('selected');
+            selectedCell = cell;
+            selectedCell.classList.add('selected');
+            saveGameState();
+        }
+
+        function fillNumber(num) {
+            if (isPaused || !selectedCell || selectedCell.classList.contains('fixed')) return;
+            const row = Array.from(selectedCell.parentNode.parentNode.children).indexOf(selectedCell.parentNode);
+            const col = Array.from(selectedCell.parentNode.children).indexOf(selectedCell);
+            if (notesMode) {
+                let notes = selectedCell.textContent.split(' ').map(n => parseInt(n)).filter(n => !isNaN(n)) || [];
+                if (notes.includes(num)) {
+                    notes = notes.filter(n => n !== num);
+                } else {
+                    notes.push(num);
+                }
+                selectedCell.textContent = notes.sort().join(' ');
+                selectedCell.classList.add('notes');
+                if (notes.length === 0) selectedCell.classList.remove('notes');
+            } else {
+                moves.push({ row, col, prev: grid[row][col] });
+                grid[row][col] = num;
+                selectedCell.textContent = num;
+                selectedCell.classList.remove('notes');
+                if (grid[row][col] !== solution[row][col]) {
+                    selectedCell.classList.add('error', 'show-message');
+                    setTimeout(() => {
+                        if (selectedCell) selectedCell.classList.remove('show-message');
+                    }, 2000);
+                } else {
+                    selectedCell.classList.remove('error', 'show-message');
+                }
+                selectedCell.classList.remove('selected');
+                selectedCell = null;
+                checkCompletion();
+            }
+            saveGameState();
+        }
+
+        function startGame(type, level) {
+            grid = puzzles[type][level].map(row => [...row]);
+            solution = solveSudoku(puzzles[type][level].map(row => [...row]));
+            document.getElementById('difficulty').textContent = {
+                easy: '簡單', medium: '中等', hard: '困難', expert: '專家', veteran: '老手', extreme: '極限'
+            }[level];
+            document.getElementById('menu-dropdown').style.display = 'none';
+            moves = [];
+            seconds = 0;
+            hintsRemaining = 5;
+            document.getElementById('hints-remaining').textContent = hintsRemaining;
+            clearInterval(timerInterval);
+            updateTimer();
+            timerInterval = setInterval(updateTimer, 1000);
+            isPaused = false;
+            notesMode = false;
+            updateNotesStatus();
+            initGrid();
+            moveGlowLine(document.querySelector('.controls .control-item:first-child'));
+            saveGameState();
+        }
+
+        function restartGame() {
+            moves = [];
+            seconds = 0;
+            hintsRemaining = 5;
+            document.getElementById('hints-remaining').textContent = hintsRemaining;
+            clearInterval(timerInterval);
+            updateTimer();
+            timerInterval = setInterval(updateTimer, 1000);
+            isPaused = false;
+            notesMode = false;
+            updateNotesStatus();
+            initGrid();
+            document.getElementById('menu-dropdown').style.display = 'none';
+            moveGlowLine(document.querySelector('.controls .control-item:first-child'));
+            saveGameState();
+        }
+
+        function showNewGameOptions() {
+            const options = document.getElementById('menu-dropdown');
+            options.style.display = options.style.display === 'none' ? 'block' : 'none';
+            document.getElementById('theme-options').style.display = 'none';
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('menu-dropdown');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            document.getElementById('theme-options').style.display = 'none';
+        }
+
+        function toggleThemeMenu() {
+            const themeOptions = document.getElementById('theme-options');
+            themeOptions.style.display = themeOptions.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function setTheme(theme) {
+            document.body.classList.toggle('dark', theme === 'dark');
+            document.getElementById('main-container').classList.toggle('dark', theme === 'dark');
+            localStorage.setItem('theme', theme);
+            document.getElementById('theme-options').style.display = 'none';
+            document.getElementById('menu-dropdown').style.display = 'none';
+        }
+
+        function updateTimer() {
+            if (isPaused) return;
+            const minutes = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const secs = (seconds % 60).toString().padStart(2, '0');
+            document.getElementById('timer').textContent = `${minutes}:${secs}`;
+            seconds++;
+            saveGameState();
+        }
+
+        function giveHint() {
+            if (isPaused || !selectedCell || hintsRemaining <= 0) {
+                if (hintsRemaining <= 0) alert('提示次數已用盡！');
+                return;
+            }
+            const row = Array.from(selectedCell.parentNode.parentNode.children).indexOf(selectedCell.parentNode);
+            const col = Array.from(selectedCell.parentNode.children).indexOf(selectedCell);
+            if (grid[row][col] === solution[row][col]) return;
+            moves.push({ row, col, prev: grid[row][col] });
+            grid[row][col] = solution[row][col];
+            selectedCell.textContent = solution[row][col];
+            selectedCell.classList.remove('notes');
+            selectedCell.classList.remove('selected');
+            selectedCell.classList.remove('error', 'show-message');
+            hintsRemaining--;
+            document.getElementById('hints-remaining').textContent = hintsRemaining;
+            const popup = document.getElementById('hint-popup');
+            document.getElementById('hint-text').textContent = `此格應填 ${solution[row][col]}，因為在第 ${row + 1} 行、第 ${col + 1} 列和對應的 3x3 區域中，其他數字已排除。`;
+            popup.style.display = 'block';
+            selectedCell = null;
+            saveGameState();
+        }
+
+        function closeHintPopup() {
+            document.getElementById('hint-popup').style.display = 'none';
+        }
+
+        function checkSolution() {
+            const cells = document.querySelectorAll('.grid td');
+            cells.forEach(cell => cell.classList.remove('show-message'));
+            let hasErrors = false;
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    if (grid[i][j] !== 0 && grid[i][j] !== solution[i][j]) {
+                        const cell = document.querySelector(`.grid tr:nth-child(${i+1}) td:nth-child(${j+1})`);
+                        cell.classList.add('error', 'show-message');
+                        hasErrors = true;
+                        setTimeout(() => cell.classList.remove('show-message'), 2000);
+                    }
+                }
+            }
+            if (!hasErrors) checkCompletion();
+            saveGameState();
+        }
+
+        function checkCompletion() {
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    if (grid[i][j] !== solution[i][j]) return;
+                }
+            }
+            clearInterval(timerInterval);
+            const time = document.getElementById('timer').textContent;
+            const difficulty = document.getElementById('difficulty').textContent;
+            const username = localStorage.getItem('currentUser') === 'guest' ? '訪客' : localStorage.getItem('currentUser');
+            saveToLeaderboard(username, difficulty, time);
+            alert(`恭喜通關！您的成績 ${time} 已記錄到排行榜 (${difficulty})。`);
+            startGame('classic', 'medium');
+        }
+
+        function saveToLeaderboard(username, difficulty, time) {
+            const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '{}');
+            const difficultyMap = {
+                '簡單': 'easy', '中等': 'medium', '困難': 'hard', '專家': 'expert', '老手': 'veteran', '極限': 'extreme'
+            };
+            const level = difficultyMap[difficulty];
+            if (!leaderboard[username]) {
+                leaderboard[username] = { easy: null, medium: null, hard: null, expert: null, veteran: null, extreme: null };
+            }
+            const currentBest = leaderboard[username][level];
+            if (!currentBest || timeToSeconds(time) < timeToSeconds(currentBest)) {
+                leaderboard[username][level] = time;
+            }
+            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+        }
+
+        function timeToSeconds(time) {
+            const [minutes, seconds] = time.split(':').map(Number);
+            return minutes * 60 + seconds;
+        }
+
+        function secondsToTime(seconds) {
+            const minutes = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const secs = (seconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${secs}`;
+        }
+
+        function showLeaderboard() {
+            const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '{}');
+            const rankedUsers = Object.entries(leaderboard).map(([username, stats]) => {
+                const totalTime = Object.values(stats).reduce((sum, time) => 
+                    sum + (time ? timeToSeconds(time) : 0), 0);
+                return { username, ...stats, totalTime };
+            }).sort((a, b) => a.totalTime - b.totalTime).filter(u => u.totalTime > 0);
+            const tbody = document.querySelector('#leaderboard-table tbody');
+            tbody.innerHTML = '';
+            rankedUsers.forEach((entry, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${entry.username}</td>
+                    <td>${entry.easy || '-'}</td>
+                    <td>${entry.medium || '-'}</td>
+                    <td>${entry.hard || '-'}</td>
+                    <td>${entry.expert || '-'}</td>
+                    <td>${entry.veteran || '-'}</td>
+                    <td>${entry.extreme || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('leaderboard-popup').style.display = 'block';
+            document.getElementById('menu-dropdown').style.display = 'none';
+        }
+
+        function closeLeaderboard() {
+            document.getElementById('leaderboard-popup').style.display = 'none';
+        }
+
+        function undoMove() {
+            if (isPaused || moves.length === 0) return;
+            const move = moves.pop();
+            grid[move.row][move.col] = move.prev;
+            const cell = document.querySelector(`.grid tr:nth-child(${move.row+1}) td:nth-child(${move.col+1})`);
+            cell.textContent = move.prev === 0 ? '' : move.prev;
+            cell.classList.remove('notes');
+            if (move.prev !== 0 && move.prev !== solution[move.row][move.col]) {
+                cell.classList.add('error');
+            } else {
+                cell.classList.remove('error', 'show-message');
+            }
+            cell.classList.remove('selected');
+            selectedCell = null;
+            saveGameState();
+        }
+
+        function toggleNotesMode() {
+            if (isPaused) return;
+            notesMode = !notesMode;
+            updateNotesStatus();
+            saveGameState();
+        }
+
+        function updateNotesStatus() {
+            const notesStatus = document.querySelector('.notes-item .notes-status');
+            notesStatus.textContent = notesMode ? '開' : '關';
+        }
+
+        function eraseCell() {
+            if (isPaused || !selectedCell || selectedCell.classList.contains('fixed')) return;
+            const row = Array.from(selectedCell.parentNode.parentNode.children).indexOf(selectedCell.parentNode);
+            const col = Array.from(selectedCell.parentNode.children).indexOf(selectedCell);
+            moves.push({ row, col, prev: grid[row][col] });
+            grid[row][col] = 0;
+            selectedCell.textContent = '';
+            selectedCell.classList.remove('notes', 'error', 'show-message', 'selected');
+            selectedCell = null;
+            saveGameState();
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            const pauseButton = document.getElementById('pause-btn');
+            pauseButton.querySelector('i').className = isPaused ? 'fas fa-play' : 'fas fa-pause';
+            pauseButton.querySelector('.annotation').textContent = isPaused ? '繼續' : '暫停';
+            const gridContainer = document.getElementById('sudoku-grid-container');
+            gridContainer.classList.toggle('paused', isPaused);
+            if (isPaused) {
+                clearInterval(timerInterval);
+                initGrid();
+            } else {
+                timerInterval = setInterval(updateTimer, 1000);
+                initGrid();
+            }
+            saveGameState();
+        }
+
+        function showAnnotation(element) {
+            if (currentAnnotationTimeout) {
+                clearTimeout(currentAnnotationTimeout);
+                document.querySelectorAll('.annotation').forEach(a => a.style.display = 'none');
+            }
+            const annotation = element.querySelector('.annotation');
+            annotation.style.display = 'block';
+            currentAnnotationTimeout = setTimeout(() => {
+                annotation.style.display = 'none';
+                currentAnnotationTimeout = null;
+            }, 4000);
+        }
+
+        function moveGlowLine(element) {
+            const glowLine = document.getElementById('glow-line');
+            const rect = element.getBoundingClientRect();
+            const controlsRect = document.querySelector('.controls').getBoundingClientRect();
+            const leftOffset = rect.left - controlsRect.left;
+            const width = rect.width;
+            glowLine.style.width = `${width}px`;
+            glowLine.style.left = `${leftOffset}px`;
+        }
+
+        function showForm(type) {
+            document.getElementById('register-form').style.display = type === 'register' ? 'flex' : 'none';
+            document.getElementById('login-form').style.display = type === 'login' ? 'flex' : 'none';
+            document.getElementById('reg-error').style.display = 'none';
+            document.getElementById('login-error').style.display = 'none';
+            document.querySelectorAll('.auth-buttons .auth-option').forEach(btn => btn.style.display = 'none');
+        }
+
+        function validateInput(id, pwd) {
+            const idRegex = /^\S+$/;
+            const pwdRegex = /^(?=.*[a-zA-Z].*[a-zA-Z])[a-zA-Z0-9]{6,}$/;
+            if (!id || !idRegex.test(id)) return "用戶ID不得為空白或包含空格";
+            if (!pwd || !pwdRegex.test(pwd)) return "密碼需至少2個英文和6個字符，不得有空格";
+            return null;
+        }
+
+        function register() {
+            const id = document.getElementById('reg-id').value;
+            const pwd = document.getElementById('reg-pwd').value;
+            const error = validateInput(id, pwd);
+            const errorElement = document.getElementById('reg-error');
+            if (error) {
+                errorElement.textContent = error;
+                errorElement.style.display = 'block';
+                return;
+            }
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            if (users[id]) {
+                errorElement.textContent = "此用戶ID已存在";
+                errorElement.style.display = 'block';
+                return;
+            }
+            users[id] = pwd;
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', id);
+            enterGame();
+        }
+
+        function login() {
+            const id = document.getElementById('login-id').value;
+            const pwd = document.getElementById('login-pwd').value;
+            const errorElement = document.getElementById('login-error');
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            if (!users[id] || users[id] !== pwd) {
+                errorElement.textContent = "用戶ID或密碼錯誤";
+                errorElement.style.display = 'block';
+                return;
+            }
+            localStorage.setItem('currentUser', id);
+            enterGame();
+        }
+
+        function guestLogin() {
+            localStorage.setItem('currentUser', 'guest');
+            enterGame();
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('gameState');
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('auth-screen').style.display = 'block';
+            document.getElementById('menu-dropdown').style.display = 'none';
+            document.querySelectorAll('.auth-buttons .auth-option').forEach(btn => btn.style.display = 'flex');
+        }
+
+        function enterGame() {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            const isGuest = localStorage.getItem('currentUser') === 'guest';
+            document.getElementById('logout-text').textContent = isGuest ? '前往登入' : '登出';
+            loadGameState();
+        }
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function saveGameState() {
+            const state = {
+                grid: grid,
+                solution: solution,
+                moves: moves,
+                seconds: seconds,
+                isPaused: isPaused,
+                notesMode: notesMode,
+                hintsRemaining: hintsRemaining,
+                difficulty: document.getElementById('difficulty').textContent
+            };
+            localStorage.setItem('gameState', JSON.stringify(state));
+        }
+
+        function loadGameState() {
+            const state = JSON.parse(localStorage.getItem('gameState'));
+            const theme = localStorage.getItem('theme');
+            if (theme) setTheme(theme);
+            if (!state) {
+                startGame('classic', 'medium');
+                return;
+            }
+            grid = state.grid || puzzles.classic.medium.map(row => [...row]);
+            solution = state.solution || solveSudoku(puzzles.classic.medium.map(row => [...row]));
+            moves = state.moves || [];
+            seconds = state.seconds || 0;
+            isPaused = state.isPaused || false;
+            notesMode = state.notesMode || false;
+            hintsRemaining = state.hintsRemaining || 5;
+            document.getElementById('difficulty').textContent = state.difficulty || '中等';
+            document.getElementById('hints-remaining').textContent = hintsRemaining;
+            updateNotesStatus();
+            initGrid();
+            updateTimer();
+            if (!isPaused) timerInterval = setInterval(updateTimer, 1000);
+            const pauseButton = document.getElementById('pause-btn');
+            pauseButton.querySelector('i').className = isPaused ? 'fas fa-play' : 'fas fa-pause';
+            pauseButton.querySelector('.annotation').textContent = isPaused ? '繼續' : '暫停';
+            moveGlowLine(document.querySelector('.controls .control-item:first-child'));
+        }
+
+        function solveSudoku(board) {
+            const empty = findEmpty(board);
+            if (!empty) return board;
+            const [row, col] = empty;
+            for (let num = 1; num <= 9; num++) {
+                if (isValid(board, row, col, num)) {
+                    board[row][col] = num;
+                    if (solveSudoku(board)) return board;
+                    board[row][col] = 0;
+                }
+            }
+            return null;
+        }
+
+        function findEmpty(board) {
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    if (board[i][j] === 0) return [i, j];
+                }
+            }
+            return null;
+        }
+
+        function isValid(board, row, col, num) {
+            for (let x = 0; x < 9; x++) {
+                if (board[row][x] === num || board[x][col] === num) return false;
+            }
+            const startRow = row - row % 3;
+            const startCol = col - col % 3;
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    if (board[i + startRow][j + startCol] === num) return false;
+                }
+            }
+            return true;
+        }
+
+        window.onload = () => {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) enterGame();
+            else document.getElementById('auth-screen').style.display = 'block';
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').then(() => {
+                    console.log('Service Worker registered');
+                }).catch(err => console.log('Service Worker registration failed:', err));
+            }
+        };
+    </script>
+</body>
+</html>
