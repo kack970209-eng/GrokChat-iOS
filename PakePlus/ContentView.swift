@@ -9,13 +9,15 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        // BottomMenuView()
         ZStack {
-            // 红色背景（覆盖整个屏幕）
             Color.white
                 .ignoresSafeArea()
-            // 你的主要内容
-            WebView(url: URL(string: "https://grok.x.ai/")!)
+            
+            if let indexPath = Bundle.main.path(forResource: "index", ofType: "html", inDirectory: "local_app") {
+                WebView(url: URL(fileURLWithPath: indexPath))
+            } else {
+                WebView(url: URL(string: "https://grok.x.ai/")!)
+            }
         }
     }
 }
